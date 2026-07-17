@@ -135,6 +135,7 @@
     justify-content: center;
     background: #f2f2f2 !important;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     text-align: center;
 }
 
