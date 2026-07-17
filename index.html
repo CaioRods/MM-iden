@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDEN - M&M Cebolas</title>
+    <link rel="icon" type="image/png" href="icone.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="print.css">
+</head>
+<!-- loading screen -->
+
+<body class="theme-light">
+    <div id="app-loader-overlay" class="loader-overlay hidden no-print">
+        <div id="wifi-loader">
+            <svg class="circle-outer" viewBox="0 0 86 86">
+                <circle class="back" cx="43" cy="43" r="40"></circle>
+
+                <circle class="front" cx="43" cy="43" r="40"></circle>
+                <circle class="new" cx="43" cy="43" r="40"></circle>
+            </svg>
+            <svg class="circle-middle" viewBox="0 0 60 60">
+                <circle class="back" cx="30" cy="30" r="27"></circle>
+                <circle class="front" cx="30" cy="30" r="27"></circle>
+            </svg>
+            <svg class="circle-inner" viewBox="0 0 34 34">
+                <circle class="back" cx="17" cy="17" r="14"></circle>
+                <circle class="front" cx="17" cy="17" r="14"></circle>
+            </svg>
+            <div class="loader-text" data-text="Carregando"></div>
+        </div>
+    </div>
+
+
+    <div class="app-shell no-print">
+        <!-- Botão Mobile Menu -->
+        <button id="mobile-menu-toggle" class="mobile-only"><i class="ri-menu-line"></i></button>
+
+        <!-- Sidebar Moderna -->
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar-header">
+                <img src="logo_M&M.jpg" alt="M&M Cebolas Logo" class="brand-logo">
+                <div class="brand-status">
+                    <span class="status-dot"></span>
+                    <span>Sistema Ativo</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">Principal</div>
+                <a href="#" class="nav-item active" data-view="catalog">
+                    <i class="ri-dashboard-line"></i>
+                    <span>Catálogo</span>
+                </a>
+                <a href="#" class="nav-item" data-view="favorites">
+                    <i class="ri-star-line"></i>
+                    <span>Destaques</span>
+                </a>
+
+                <div class="nav-section">Gestão</div>
+                <a href="#" class="nav-item" id="sidebar-add-btn">
+                    <i class="ri-add-box-line"></i>
+                    <span>Novo Produto</span>
+                </a>
+                <a href="#" class="nav-item" id="sidebar-export-btn">
+                    <i class="ri-download-2-line"></i>
+                    <span>Exportar Backup</span>
+                </a>
+
+                <div class="nav-section">Preferências</div>
+                <div class="theme-toggle-container">
+                    <button class="theme-btn active" id="theme-light" title="Modo Claro"><i
+                            class="ri-sun-line"></i></button>
+                    <button class="theme-btn" id="theme-dark" title="Modo Escuro"><i class="ri-moon-line"></i></button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">ALM</div>
+                    <div class="user-info">
+                        <span class="user-name">Conferente</span>
+                        <span class="user-role">Almoxarifado</span>
+
+                    </div>
+                    <span class="user-role">Made by @Caio.riguess</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área de Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-search">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="searchInput" placeholder="Busque por código ou descrição..."
+                        autocomplete="off">
+                    <span class="search-shortcut">/</span>
+                </div>
+
+                <div class="header-stats">
+                    <div class="mini-stat">
+                        <span class="label">Total Itens</span>
+                        <span class="value" id="stat-total">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="label">Sessão</span>
+                        <span class="value" id="stat-session">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="scroll-area">
+                <!-- Seção de Destaques -->
+                <section class="content-section" id="section-highlights">
+                    <div class="section-header">
+                        <h2><i class="ri-star-fill text-yellow"></i> Itens Frequentes</h2>
+                        <span class="badge" id="badge-highlights">0 itens</span>
+                    </div>
+                    <div class="grid-container" id="highlightsGrid"></div>
+                </section>
+
+                <!-- Catálogo Geral -->
+                <section class="content-section">
+                    <div class="section-header">
+                        <h2><i class="ri-box-3-fill text-red"></i> Catálogo de Materiais</h2>
+                        <div class="header-filters" id="filterContainer">
+                            <button class="filter-btn active" data-filter="all">Todos</button>
+                        </div>
+                    </div>
+                    <div class="grid-container" id="productsGrid"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modais Glassmorphism -->
+    <div id="modal-action" class="modal-overlay hidden">
+        <div class="glass-modal zoom-anim">
+            <div class="modal-top">
+                <div class="prod-identity">
+                    <span id="preview-code" class="code-pill">0000</span>
+                    <h3 id="preview-name">Nome do Produto</h3>
+                </div>
+                <button class="close-modal"><i class="ri-close-line"></i></button>
+            </div>
+
+            <div class="action-grid-v2">
+                <button id="btn-open-form" class="action-card-v2 primary">
+                    <div class="card-icon"><i class="ri-printer-line"></i></div>
+                    <div class="card-info">
+                        <strong>Imprimir Etiqueta</strong>
+                        <span>Gerar identificação física</span>
+                    </div>
+                </button>
+
+                <button id="btn-show-code" class="action-card-v2">
+                    <div class="card-icon"><i class="ri-fullscreen-line"></i></div>
+                    <div class="card-info">
+                        <strong>Ver Código</strong>
+                        <span>Visualização em tela cheia</span>
+                    </div>
+                </button>
+
+                <button id="btn-edit-product-trigger" class="action-card-v2">
+                    <div class="card-icon"><i class="ri-edit-line"></i></div>
+                    <div class="card-info">
+                        <strong>Editar</strong>
+                        <span>Alterar dados do produto</span>
+                    </div>
+                </button>
+
+                <button id="btn-delete-product-trigger" class="action-card-v2 danger">
+                    <div class="card-icon"><i class="ri-delete-bin-line"></i></div>
+                    <div class="card-info">
+                        <strong>Excluir</strong>
+                        <span>Remover permanentemente</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Formulário de Impressão -->
+    <div id="modal-form" class="modal-overlay hidden">
+        <div class="glass-modal zoom-anim">
+            <div class="modal-top">
+                <h3>Dados de Identificação</h3>
+                <button class="close-modal"><i class="ri-close-line"></i></button>
+            </div>
+
+            <div class="smart-form">
+                <div class="form-group-row">
+                    <label class="type-selector">
+                        <input type="radio" name="op-type" value="recebimento" checked>
+                        <div class="type-content">
+                            <i class="ri-download-cloud-2-line"></i>
+                            <span>Recebimento</span>
+                        </div>
+                    </label>
+                    <label class="type-selector">
+                        <input type="radio" name="op-type" value="devolucao">
+                        <div class="type-content">
+                            <i class="ri-reply-line"></i>
+                            <span>Devolução</span>
+                        </div>
+                    </label>
+                </div>  
+
+                <div class="input-row">
+                    <div class="floating-input">
+                        <input type="text" id="input-nf" placeholder=" ">
+                        <label>Nota Fiscal</label>
+                    </div>
+                    <div class="floating-input">
+                        <input type="text" id="input-qty" placeholder=" ">
+                        <label>Quantidade</label>
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="floating-input">
+                        <input type="text" id="input-lote" placeholder=" ">
+                        <label>Lote / Fabricação</label>
+                    </div>
+                    <div class="floating-input">
+                        <input type="date" id="input-validade"  placeholder=" ">
+                        <label>Data Validade</label>
+                    </div>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="input-alergenico">
+                    <label for="input-alergenico">
+                        <span class="custom-checkbox"></span>
+                        <span class="label-text">Material Alergênico</span>
+                    </label>
+                </div>
+                <button id="btn-generate-print" class="main-action-btn">    
+                    <i class="ri-printer-fill"></i> Gerar Documento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar/Editar Produto -->
+    <div id="modal-product-form" class="modal-overlay hidden">
+        <div class="modal-content product-modal">
+            <div class="modal-header">
+                <i class="ri-edit-box-line modal-icon-header"></i>
+                <h2 id="product-modal-title">Editar Material</h2>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group-v2">
+                    <label><i class="ri-hashtag"></i> Código do Produto</label>
+                    <input type="text" id="prod-code" placeholder="Ex: 1001157">
+                </div>
+
+                <div class="input-group-v2">
+                    <label><i class="ri-text-snippet"></i> Descrição / Nome</label>
+                    <input type="text" id="prod-name" placeholder="Ex: CX 259 A CATCHUP...">
+                </div>
+
+                <div class="input-group-v2">
+                    <label><i class="ri-scales-3-line"></i> Quantidade Padrão (Palete)</label>
+                    <input type="text" id="prod-qty" placeholder="Ex: 2800">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel close-modal">Cancelar</button>
+                <button class="btn-save-confirm" id="btn-save-product">
+                    <i class="ri-save-line"></i> Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Visualização de Código Fullscreen -->
+    <div id="modal-code" class="modal-overlay hidden">
+        <div class="fullscreen-view">
+            <button class="close-modal-fs"><i class="ri-close-line"></i></button>
+            <div class="fs-content">
+                <span id="display-name-fs">Nome do Produto</span>
+                <h1 id="display-code-fs">000000</h1>
+                <button id="btn-copy-code" class="copy-btn-fs"><i class="ri-file-copy-line"></i> Copiar Código</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Área de Impressão (Preview 3D) -->
+    <div id="print-area" class="print-overlay hidden">
+        <div class="print-toolbar no-print">
+            <div class="toolbar-msg">Preview de Impressão 3D</div>
+            <div class="toolbar-btns">
+                <button id="close-print" class="btn-text">Cancelar</button>
+                <button onclick="window.print()" class="btn-print">IMPRIMIR</button>
+            </div>
+        </div>
+        <div class="sheet-viewport">
+            <div class="official-sheet">
+                <div class="tbl-row header-row">
+                    <div class="tbl-cell logo-cell"><img src="logo_M&M.jpg" alt="M&M Cebolas"></div>
+                    <div class="tbl-cell title-cell">SISTEMA DE GESTÃO DA QUALIDADE E SEGURANÇA DE ALIMENTOS</div>
+                    <div class="tbl-cell meta-cell">
+                        <div class="meta-item">Emissão: 23/04/2021</div>
+                        <div class="meta-item">Revisão: 03</div>
+                        <div class="meta-item border-none">Atualizado em: 04/02/2026</div>
+                        <div class="meta-item code-cell">Código: FRM/ALM/DIV/015</div>
+                        <div class="meta-item page-cell">Página: 1 de 1</div>
+                    </div>
+                </div>
+                <div class="tbl-row subheader-row">
+                    <div class="tbl-cell doc-cell">Documento: FORMULÁRIO</div>
+
+                </div>
+                <div class="tbl-row subheader-row border-top-none">
+                    <div class="tbl-cell desc-cell">Descrição: IDENTIFICAÇÃO DE MATERIAL</div>
+
+                </div>
+                <div class="tbl-row date-row">DATA: <span id="print-date" contenteditable="true"
+                        style="font-size: 9pt;"></span></div>
+                <div id="print-section-title" class="tbl-row section-title-row">CÓDIGO/DESCRIÇÃO MATERIAL</div>
+                <div class="tbl-row big-content-row">
+                    <div class="container-produto-ajustavel">
+                        <span id="print-code" class="big-code-text" contenteditable="true"></span>
+                        <span class="big-sep">-</span>
+                        <span id="print-product" class="big-prod-text" contenteditable="true"></span>
+                    </div>
+                </div>
+                <div class="tbl-row checks-row">
+                    <div class="tbl-cell check-cell">
+                        <div class="checkbox-box" id="box-rec"></div><span class="check-label">RECEBIMENTO</span>
+                    </div>
+                    <div class="tbl-cell check-cell border-left">
+                        <div class="checkbox-box" id="box-dev"></div><span class="check-label">DEVOLUÇÃO/FÁBRICA</span>
+                    </div>
+                </div>
+                <div class="tbl-row grid-header-row" id="print-grid-header">
+                    <div class="tbl-cell g-col" id="header-qty">QUANTIDADE</div>
+                    <div class="tbl-cell g-col border-left" id="header-lote">LOTE/DATA FAB.</div>
+                    <div class="tbl-cell g-col border-left" id="header-validade">DATA VALIDADE</div>
+                </div>
+                <div class="tbl-row grid-values-row" id="print-grid-values">
+                    <div class="tbl-cell g-val qnt" id="print-qty" contenteditable="true"></div>
+                    <div class="tbl-cell g-val border-left lote" id="print-lote" contenteditable="true"></div>
+                    <div class="tbl-cell g-val border-left" id="print-validade" contenteditable="true"></div>
+                </div>
+                <div class="tbl-row footer-info-row">
+                    <div class="tbl-cell nf-cell" style="flex: 1; font-size: 20pt;font-weight: bold;">Nota Fiscal: <span
+                            id="print-nf" contenteditable="true" style="color: rgb(155, 11, 11);"></span></div>
+                    <div class="tbl-cell daylot-cell" id="print-day-lot" contenteditable="true"
+                        style="width: 150px; border-left: 1px solid black;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="text-editor-toolbar" class="text-editor-toolbar no-print">
+        <div class="toolbar-group">
+            <button onclick="applyStyle('bold')" title="Negrito (Ctrl+B)"><i class="ri-bold"></i></button>
+            <button onclick="applyStyle('italic')" title="Itálico (Ctrl+I)"><i class="ri-italic"></i></button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="font-size-container" title="Tamanho da Fonte (Shift + ↑/↓)">
+            <input type="number" id="font-size-input" value="16" min="1" max="200" autocomplete="off">
+            <span class="unit">px</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="toolbar-group">
+            <input type="color" onchange="applyStyle('foreColor', this.value)" title="Cor da Fonte"
+                class="color-picker-input">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="toolbar-group">
+            <button onclick="applyStyle('justifyLeft')" title="Alinhar Esquerda"><i class="ri-align-left"></i></button>
+            <button onclick="applyStyle('justifyCenter')" title="Centralizar"><i class="ri-align-center"></i></button>
+        </div>
+    </div>
+
+    <!-- Notificações (Toast) -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
