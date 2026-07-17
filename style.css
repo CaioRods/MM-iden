@@ -354,14 +354,68 @@ body {
 .card-code {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.7rem;
-    color: rgb(255, 255, 255);
-    font-weight: 700;
-    background: rgb(189, 11, 11);
-    padding: 3px 8px;
+    color: var(--brand-yellow); /* amarelo laranjado */
+    font-weight: 800;
+    background: var(--brand-red); /* verde */
+    padding: 4px 8px;
     border-radius: 6px;
     display: inline-block;
     margin-bottom: 0.75rem;
     width: fit-content;
+}
+
+.card-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    margin-bottom: 12px;
+}
+
+.onion-svg {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-card:hover .onion-svg {
+    transform: scale(1.15) rotate(5deg);
+}
+
+/* Tamanhos */
+.onion-svg.onion-small {
+    width: 24px;
+    height: 24px;
+}
+.onion-svg.onion-medium {
+    width: 36px;
+    height: 36px;
+}
+.onion-svg.onion-large {
+    width: 48px;
+    height: 48px;
+}
+
+/* Cores das cebolas amarelas */
+.onion-svg.onion-yellow .onion-body {
+    fill: #ffe082; /* amarelo suave */
+    stroke: #ff9800; /* laranjado/amarelo */
+    stroke-width: 2.5px;
+}
+.onion-svg.onion-yellow .onion-line {
+    fill: none;
+    stroke: #ff9800;
+    stroke-width: 2px;
+}
+
+/* Cores da cebola roxa */
+.onion-svg.onion-purple .onion-body {
+    fill: #f3e5f5; /* roxo bem suave */
+    stroke: #a21f7b; /* roxo/magenta */
+    stroke-width: 2.5px;
+}
+.onion-svg.onion-purple .onion-line {
+    fill: none;
+    stroke: #a21f7b;
+    stroke-width: 2px;
 }
 
 .card-name {

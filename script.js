@@ -144,18 +144,51 @@ function render(query = '') {
     rebindCardEvents();
 }
 
-// CARD ATUALIZADO COM BADGE DE QUANTIDADE
+function getOnionIcon(product) {
+    const code = product.codigo;
+    const name = product.produto.toLowerCase();
+    
+    let sizeClass = 'onion-medium';
+    let colorClass = 'onion-yellow';
+    
+    // cx-1 is small yellow, cx-2 is medium yellow, cx-3 is large yellow, cebola roxa is medium roxa
+    if (code === '101001') {
+        sizeClass = 'onion-small';
+        colorClass = 'onion-yellow';
+    } else if (code === '101002') {
+        sizeClass = 'onion-medium';
+        colorClass = 'onion-yellow';
+    } else if (code === '101003') {
+        sizeClass = 'onion-large';
+        colorClass = 'onion-yellow';
+    } else if (code === '101004' || name.includes('roxa')) {
+        sizeClass = 'onion-medium';
+        colorClass = 'onion-purple';
+    }
+    
+    return `
+    <svg class="onion-svg ${sizeClass} ${colorClass}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 6C30 17 15 26 15 42A17 17 0 0 0 49 42C49 26 34 17 32 6Z" class="onion-body" />
+        <path d="M32 6C27 20 25 32 32 59" class="onion-line" />
+        <path d="M32 6C37 20 39 32 32 59" class="onion-line" />
+    </svg>
+    `;
+}
+
+// CARD ATUALIZADO COM BADGE DE QUANTIDADE E ÍCONE DE CEBOLA
 function createCard(p) {
     const div = document.createElement('div');
     div.className = 'product-card zoom-anim';
     if (highlights.includes(p.codigo)) div.classList.add('is-highlight');
     div.dataset.id = p.codigo;
     
-    // Layout estruturado para a badge ficar bonita no canto
     div.innerHTML = `
         <div class="card-header-info">
             <span class="card-code">#${p.codigo}</span>
             ${(p.quantidade && p.quantidade.trim() !== "") ? `<span class="badge-qty-card">${p.quantidade}</span>` : ''}
+        </div>
+        <div class="card-icon-container">
+            ${getOnionIcon(p)}
         </div>
         <h3 class="card-name">${p.produto}</h3>
         ${highlights.includes(p.codigo) ? '<i class="ri-star-fill card-star"></i>' : ''}
