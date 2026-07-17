@@ -339,65 +339,119 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    min-height: 120px;
+    justify-content: space-between;
+    min-height: 160px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Default dynamic color tokens */
+.product-card.card-yellow-onion {
+    --card-accent: #e28c25;
+    --card-accent-rgb: 226, 140, 37;
+}
+
+.product-card.card-purple-onion {
+    --card-accent: #a21f7b;
+    --card-accent-rgb: 162, 31, 123;
+}
+
+.product-card.card-other {
+    --card-accent: #0ea5e9;
+    --card-accent-rgb: 14, 165, 233;
 }
 
 .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--brand-red);
+    transform: translateY(-6px);
+    border-color: var(--card-accent);
+    box-shadow: 0 12px 24px rgba(var(--card-accent-rgb), 0.15);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(var(--card-accent-rgb), 0.04) 100%);
+}
+
+.card-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .card-code {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--brand-yellow); /* amarelo laranjado */
+    font-size: 0.75rem;
     font-weight: 800;
-    background: var(--brand-red); /* verde */
     padding: 4px 8px;
     border-radius: 6px;
     display: inline-block;
-    margin-bottom: 0.75rem;
     width: fit-content;
+    background: rgba(var(--card-accent-rgb), 0.12);
+    color: var(--card-accent);
+    transition: all 0.25s ease;
+}
+
+.card-star {
+    color: var(--brand-yellow);
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
 }
 
 .card-icon-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 60px;
-    margin-bottom: 12px;
+    height: 70px;
+    margin-bottom: 10px;
 }
 
+/* Icon Wrapper and Base */
+.product-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.product-card:hover .product-icon-wrapper {
+    background: rgba(var(--card-accent-rgb), 0.15);
+    box-shadow: 0 0 15px rgba(var(--card-accent-rgb), 0.25);
+    transform: scale(1.1);
+}
+
+/* Onion SVGs */
 .onion-svg {
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.product-card:hover .onion-svg {
-    transform: scale(1.15) rotate(5deg);
-}
-
-/* Tamanhos */
+/* Onion Size Classes */
 .onion-svg.onion-small {
     width: 24px;
     height: 24px;
 }
 .onion-svg.onion-medium {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
 }
 .onion-svg.onion-large {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
 }
 
-/* Cores das cebolas amarelas */
+/* Onion Coloring */
 .onion-svg.onion-yellow .onion-body {
-    fill: #ffe082; /* amarelo suave */
-    stroke: #ff9800; /* laranjado/amarelo */
+    fill: #ffe082;
+    stroke: #ff9800;
     stroke-width: 2.5px;
 }
 .onion-svg.onion-yellow .onion-line {
@@ -406,16 +460,58 @@ body {
     stroke-width: 2px;
 }
 
-/* Cores da cebola roxa */
 .onion-svg.onion-purple .onion-body {
-    fill: #f3e5f5; /* roxo bem suave */
-    stroke: #a21f7b; /* roxo/magenta */
+    fill: #f3e5f5;
+    stroke: #a21f7b;
     stroke-width: 2.5px;
 }
 .onion-svg.onion-purple .onion-line {
     fill: none;
     stroke: #a21f7b;
     stroke-width: 2px;
+}
+
+/* Other products icon */
+.other-product-icon,
+.other-icon {
+    font-size: 1.8rem;
+    color: var(--card-accent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.other-icon i {
+    transition: color 0.25s ease;
+}
+
+/* Keyframe Animations for Hover */
+@keyframes onion-wiggle-yellow {
+    0% { transform: rotate(-6deg) scale(1.05); }
+    100% { transform: rotate(6deg) scale(1.05); }
+}
+
+@keyframes onion-wiggle-purple {
+    0% { transform: rotate(6deg) scale(1.05); }
+    100% { transform: rotate(-6deg) scale(1.05); }
+}
+
+@keyframes other-bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+    100% { transform: translateY(0); }
+}
+
+.product-card.card-yellow-onion:hover .onion-svg {
+    animation: onion-wiggle-yellow 0.6s ease-in-out infinite alternate;
+}
+
+.product-card.card-purple-onion:hover .onion-svg {
+    animation: onion-wiggle-purple 0.6s ease-in-out infinite alternate;
+}
+
+.product-card.card-other:hover .other-icon i {
+    animation: other-bounce 0.6s ease-in-out infinite;
 }
 
 .card-name {
@@ -771,11 +867,12 @@ body {
 /* Estilos de Filtro e Destaques */
 .header-filters {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.25rem;
     background: var(--bg-input);
     padding: 4px;
     border-radius: 12px;
     border: 1px solid var(--border);
+    align-items: center;
 }
 
 .filter-btn {
@@ -787,11 +884,23 @@ body {
     font-weight: 700;
     cursor: pointer;
     color: var(--text-muted);
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-btn i {
+    font-size: 0.95rem;
 }
 
 .filter-btn:hover {
     color: var(--text-main);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.theme-dark .filter-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .filter-btn.active {
@@ -800,31 +909,31 @@ body {
     box-shadow: var(--shadow);
 }
 
+.theme-dark .filter-btn.active {
+    background: var(--bg-input);
+    color: #4ade80; /* Vibrant green on dark mode for contrast */
+    box-shadow: var(--shadow);
+}
+
 .is-highlight {
     border-color: var(--brand-yellow) !important;
     background: linear-gradient(to bottom right, var(--bg-card), rgba(255, 199, 44, 0.05)) !important;
 }
 
-.card-star {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    color: var(--brand-yellow);
-    font-size: 1rem;
-}
 /* Badge de Quantidade no Card */
 .badge-qty-card {
-    background: rgba(14, 80, 55, 0.1); /* Verde M&M bem suave */
-    color: var(--brand-red);
     font-size: 0.7rem;
     padding: 3px 8px;
     border-radius: 6px;
     font-weight: 800;
     font-family: 'JetBrains Mono', monospace;
-    border: 1px solid rgba(14, 80, 55, 0.2);
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    background: rgba(var(--card-accent-rgb), 0.08);
+    border: 1px solid rgba(var(--card-accent-rgb), 0.2);
+    color: var(--card-accent);
+    transition: all 0.25s ease;
 }
 
 .badge-qty-card::before {
@@ -834,26 +943,10 @@ body {
     font-size: 0.6rem;
 }
 
-/* Ajuste no Card para acomodar a badge */
-.product-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 120px;
-}
-
-.card-header-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-
-/* No tema escuro, a badge fica mais visível */
 .theme-dark .badge-qty-card {
-    background: rgba(14, 80, 55, 0.2);
-    border-color: var(--brand-red);
-    color: #4ade80;
+    background: rgba(var(--card-accent-rgb), 0.15);
+    border-color: rgba(var(--card-accent-rgb), 0.3);
+    color: var(--card-accent);
 }
 
 /* Estilização Premium do Modal de Produto */

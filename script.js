@@ -78,17 +78,16 @@ function updateStats() {
 
 function setupFilters() {
     const filters = [
-        { id: 'all', label: 'Todos' },
-        { id: 'cx', label: 'Caixas', keywords: ['CX'] },
-        { id: 'frascos', label: 'Frascos', keywords: ['FRASCO'] },
-        { id: 'mp', label: 'Matéria Prima', keywords: ['AROMA', 'CORANTE', 'POLPA', 'AMIDO', 'SAL', 'AÇUCAR', 'VINAGRE'] }
+        { id: 'all', label: 'Todos', icon: 'ri-function-line' },
+        { id: 'cebola', label: 'Cebola', icon: 'ri-seedling-line' },
+        { id: 'outros', label: 'Outros', icon: 'ri-box-3-line' }
     ];
 
     filterContainer.innerHTML = '';
     filters.forEach(f => {
         const btn = document.createElement('button');
         btn.className = `filter-btn ${currentFilter === f.id ? 'active' : ''}`;
-        btn.textContent = f.label;
+        btn.innerHTML = `<i class="${f.icon}"></i> <span>${f.label}</span>`;
         btn.onclick = () => {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -99,7 +98,7 @@ function setupFilters() {
     });
 }
 
-// RENDERIZAÇÃO ATUALIZADA COM QUANTIDADE
+// RENDERIZAÇÃO ATUALIZADA COM FILTROS DE CEBOLA E OUTROS
 function render(query = '') {
     productsGrid.innerHTML = '';
     highlightsGrid.innerHTML = '';
@@ -113,12 +112,9 @@ function render(query = '') {
         if (!matchesQuery) return false;
 
         if (currentFilter === 'all') return true;
-        if (currentFilter === 'cx') return p.produto.includes('CX');
-        if (currentFilter === 'frascos') return p.produto.includes('FRASCO');
-        if (currentFilter === 'mp') {
-            const mpKeywords = ['AROMA', 'CORANTE', 'POLPA', 'AMIDO', 'SAL', 'AÇUCAR', 'VINAGRE'];
-            return mpKeywords.some(k => p.produto.includes(k));
-        }
+        const isCebola = p.produto.toLowerCase().includes('cebola');
+        if (currentFilter === 'cebola') return isCebola;
+        if (currentFilter === 'outros') return !isCebola;
         return true;
     });
 
@@ -144,14 +140,22 @@ function render(query = '') {
     rebindCardEvents();
 }
 
-function getOnionIcon(product) {
+function getProductIcon(product) {
     const code = product.codigo;
     const name = product.produto.toLowerCase();
+    
+    // Se não for cebola, retorna um ícone de material genérico (caixa)
+    if (!name.includes('cebola')) {
+        return `
+        <div class="product-icon-wrapper other-icon">
+            <i class="ri-box-3-line"></i>
+        </div>
+        `;
+    }
     
     let sizeClass = 'onion-medium';
     let colorClass = 'onion-yellow';
     
-    // cx-1 is small yellow, cx-2 is medium yellow, cx-3 is large yellow, cebola roxa is medium roxa
     if (code === '101001') {
         sizeClass = 'onion-small';
         colorClass = 'onion-yellow';
@@ -167,31 +171,50 @@ function getOnionIcon(product) {
     }
     
     return `
-    <svg class="onion-svg ${sizeClass} ${colorClass}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-        <path d="M32 6C30 17 15 26 15 42A17 17 0 0 0 49 42C49 26 34 17 32 6Z" class="onion-body" />
-        <path d="M32 6C27 20 25 32 32 59" class="onion-line" />
-        <path d="M32 6C37 20 39 32 32 59" class="onion-line" />
-    </svg>
+    <div class="product-icon-wrapper onion-icon">
+        <svg class="onion-svg ${sizeClass} ${colorClass}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 6C30 17 15 26 15 42A17 17 0 0 0 49 42C49 26 34 17 32 6Z" class="onion-body" />
+            <path d="M32 6C27 20 25 32 32 59" class="onion-line" />
+            <path d="M32 6C37 20 39 32 32 59" class="onion-line" />
+        </svg>
+    </div>
     `;
 }
 
-// CARD ATUALIZADO COM BADGE DE QUANTIDADE E ÍCONE DE CEBOLA
+// CARD ATUALIZADO COM BADGE DE QUANTIDADE, ÍCONE E CLASSES DE COR DINÂMICAS
 function createCard(p) {
     const div = document.createElement('div');
     div.className = 'product-card zoom-anim';
+    
+    // Determinar a classe de cor e tipo de produto para estilização e animações
+    const code = p.codigo;
+    const name = p.produto.toLowerCase();
+    
+    const isCebola = name.includes('cebola');
+    
+    if (!isCebola) {
+        div.classList.add('card-other');
+    } else if (code === '101004' || name.includes('roxa')) {
+        div.classList.add('card-purple-onion');
+    } else {
+        div.classList.add('card-yellow-onion');
+    }
+    
     if (highlights.includes(p.codigo)) div.classList.add('is-highlight');
     div.dataset.id = p.codigo;
     
     div.innerHTML = `
         <div class="card-header-info">
-            <span class="card-code">#${p.codigo}</span>
+            <div class="card-header-left">
+                <span class="card-code">#${p.codigo}</span>
+                ${highlights.includes(p.codigo) ? '<i class="ri-star-fill card-star"></i>' : ''}
+            </div>
             ${(p.quantidade && p.quantidade.trim() !== "") ? `<span class="badge-qty-card">${p.quantidade}</span>` : ''}
         </div>
         <div class="card-icon-container">
-            ${getOnionIcon(p)}
+            ${getProductIcon(p)}
         </div>
         <h3 class="card-name">${p.produto}</h3>
-        ${highlights.includes(p.codigo) ? '<i class="ri-star-fill card-star"></i>' : ''}
     `;
     return div;
 }
