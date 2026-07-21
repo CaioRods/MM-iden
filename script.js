@@ -35,32 +35,80 @@ async function init() {
     setupFilters();
     render();
     updateStats();
-    setupEventListeners(); // Removido loadData e setInterval
+    setupEventListeners();
     showToast("Sistema M&M Cebolas ID Pro Inicializado", "success");
+
+    // Sincroniza com o Portal em segundo plano ao abrir — não bloqueia a renderização inicial
+    syncWithPortal(false);
+}
+
+// Endpoint público do Portal M&M Cebolas (só id/nome, sem preço/custo) — usado para manter o
+// catálogo de etiquetas em sincronia com os produtos cadastrados lá. O portal é a fonte da
+// verdade para QUAIS produtos existem e seus nomes; código de etiqueta e quantidade continuam
+// sendo preenchidos manualmente aqui, por produto.
+const PORTAL_API_URL = 'https://portalmmcebolas.com/api/public/produtos';
+
+function normalizeNome(nome) {
+    return (nome || '').trim().toUpperCase().replace(/CAIXA/gi, 'CX');
+}
+
+function gerarProximoCodigo() {
+    const nums = products.map(p => parseInt(p.codigo, 10)).filter(n => !isNaN(n));
+    const max = nums.length ? Math.max(...nums) : 101000;
+    return String(max + 1);
+}
+
+async function syncWithPortal(manual = false) {
+    const btn = document.getElementById('btn-sync-portal');
+    if (btn) { btn.querySelector('i').className = 'ri-loader-4-line ri-spin'; }
+
+    try {
+        const response = await fetch(PORTAL_API_URL);
+        if (!response.ok) throw new Error('Portal indisponível');
+        const portalProducts = await response.json();
+        let changed = false;
+
+        // Remove itens que vieram do portal mas foram excluídos lá
+        const portalIds = new Set(portalProducts.map(p => p.id));
+        const beforeLen = products.length;
+        products = products.filter(p => p.portalId === undefined || portalIds.has(p.portalId));
+        if (products.length !== beforeLen) changed = true;
+
+        // Adiciona novos / atualiza nome dos já vinculados / linka produtos manuais existentes
+        // com o mesmo nome (evita duplicar o que já foi cadastrado antes da sincronização existir)
+        portalProducts.forEach(pp => {
+            const nomeFormatado = normalizeNome(pp.nome);
+            let existing = products.find(p => p.portalId === pp.id);
+            if (!existing) {
+                existing = products.find(p => p.portalId === undefined && normalizeNome(p.produto) === nomeFormatado);
+                if (existing) { existing.portalId = pp.id; changed = true; }
+            }
+            if (existing) {
+                if (existing.produto !== nomeFormatado) { existing.produto = nomeFormatado; changed = true; }
+            } else {
+                products.push({ codigo: gerarProximoCodigo(), produto: nomeFormatado, quantidade: ' ', portalId: pp.id });
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            await saveData();
+            render();
+            updateStats();
+            if (manual) showToast('Catálogo sincronizado com o Portal!', 'success');
+        } else if (manual) {
+            showToast('Catálogo já está atualizado', 'success');
+        }
+    } catch (e) {
+        console.warn("Não foi possível sincronizar com o Portal:", e);
+        if (manual) showToast('Não foi possível conectar ao Portal', 'error');
+    } finally {
+        if (btn) { btn.querySelector('i').className = 'ri-refresh-line'; }
+    }
 }
 
 async function loadData() {
-    try {
-        const response = await fetch(API_URL);
-        if (response.ok) {
-            const data = await response.json();
-            const newDataStr = JSON.stringify(data);
-            const oldDataStr = JSON.stringify({ products, highlights });
-            
-            if (newDataStr !== oldDataStr) {
-                products = data.products.map(p => ({
-                    ...p,
-                    produto: p.produto.replace(/CAIXA/gi, 'CX')
-                }));
-                highlights = data.highlights;
-                localStorage.setItem('mm_db_cache', JSON.stringify({ products, highlights }));
-                render();
-                updateStats();
-            }
-        }
-    } catch (e) {
-        console.warn("Servidor remoto offline. Usando dados locais.");
-    }
+    await syncWithPortal(false);
 }
 
 async function saveData() {
